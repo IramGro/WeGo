@@ -9,6 +9,7 @@ import '../../data/models/itinerary_item.dart';
 import '../../core/providers.dart';
 import '../../core/services/weather_service.dart';
 import '../../core/services/location_service.dart';
+import '../../core/services/notification_service.dart';
 
 class ItineraryPage extends ConsumerStatefulWidget {
   const ItineraryPage({super.key});
@@ -354,7 +355,7 @@ class _DayCardState extends State<_DayCard> {
       timeStr = '$hh:$mm';
     }
 
-    await widget.repo.addItem(
+    final item = await widget.repo.addItem(
       tripId: widget.tripId,
       dayDate: widget.dayDate,
       title: title,
@@ -362,6 +363,9 @@ class _DayCardState extends State<_DayCard> {
       notes: notesCtrl.text.trim().isEmpty ? null : notesCtrl.text.trim(),
       locationUrl: locationCtrl.text.trim().isEmpty ? null : locationCtrl.text.trim(),
     );
+
+    // Programar recordatorios (2h, 1h, 30min antes)
+    await NotificationService().scheduleActivityReminders(item);
 
     setState(() {});
   }

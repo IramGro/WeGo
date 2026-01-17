@@ -78,7 +78,7 @@ class ItineraryRepository {
     return items;
   }
 
-  Future<void> addItem({
+  Future<ItineraryItem> addItem({
     required String tripId,
     required DateTime dayDate,
     required String title,
@@ -89,7 +89,7 @@ class ItineraryRepository {
     final isar = await IsarDb.instance();
     final d = DateTime(dayDate.year, dayDate.month, dayDate.day);
 
-    await isar.writeTxn(() async {
+    return await isar.writeTxn(() async {
       final now = DateTime.now();
       final item = ItineraryItem()
         ..tripId = tripId
@@ -102,6 +102,7 @@ class ItineraryRepository {
         ..updatedAt = now;
 
       await isar.itineraryItems.put(item);
+      return item;
     });
   }
 

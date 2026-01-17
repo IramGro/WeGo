@@ -5,9 +5,13 @@ import 'package:intl/date_symbol_data_local.dart';
 
 import 'firebase_options.dart';
 import 'app.dart';
+import 'core/services/notification_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Inicializar notificaciones
+  await NotificationService().init();
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
