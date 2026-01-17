@@ -25,15 +25,17 @@ subprojects {
 }
 
 subprojects {
-    afterEvaluate {
-        val android = project.extensions.findByName("android") as? com.android.build.gradle.BaseExtension
-        if (android != null && android.namespace == null) {
+    // Inyectar namespace para librerías legacy que no lo tengan especificado
+    // Usamos esta lógica directamente en el bloque subprojects para evitar afterEvaluate issues
+    val androidExt = project.extensions.findByName("android")
+    if (androidExt is com.android.build.gradle.BaseExtension) {
+        if (androidExt.namespace == null) {
             val manifestFile = project.file("src/main/AndroidManifest.xml")
             if (manifestFile.exists()) {
                 val manifestXml = groovy.xml.XmlParser().parse(manifestFile)
                 val packageName = manifestXml.attribute("package")?.toString()
                 if (packageName != null) {
-                    android.namespace = packageName
+                    androidExt.namespace = packageName
                 }
             }
         }
