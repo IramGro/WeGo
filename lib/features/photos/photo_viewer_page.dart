@@ -1,12 +1,20 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'photo_model.dart';
 
 class PhotoViewerPage extends StatelessWidget {
   final TripPhoto photo;
 
   const PhotoViewerPage({super.key, required this.photo});
+
+  Future<void> _downloadPhoto() async {
+    final uri = Uri.parse(photo.url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +32,13 @@ class PhotoViewerPage extends StatelessWidget {
              Text(dateStr, style: const TextStyle(fontSize: 12, color: Colors.grey)),
           ],
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.download),
+            tooltip: 'Descargar / Abrir original',
+            onPressed: _downloadPhoto,
+          ),
+        ],
       ),
       body: Center(
         child: InteractiveViewer(

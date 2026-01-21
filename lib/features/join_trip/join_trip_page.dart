@@ -1,17 +1,19 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/services.dart';
 
 import '../../data/repositories/trip_repository.dart';
+import '../auth/auth_controller.dart';
 
-class JoinTripPage extends StatefulWidget {
+class JoinTripPage extends ConsumerStatefulWidget {
   const JoinTripPage({super.key});
 
   @override
-  State<JoinTripPage> createState() => _JoinTripPageState();
+  ConsumerState<JoinTripPage> createState() => _JoinTripPageState();
 }
 
-class _JoinTripPageState extends State<JoinTripPage> {
+class _JoinTripPageState extends ConsumerState<JoinTripPage> {
   final _repo = TripRepository();
 
   final _createName = TextEditingController();
@@ -80,10 +82,24 @@ class _JoinTripPageState extends State<JoinTripPage> {
     }
   }
 
+  Future<void> _signOut() async {
+    await ref.read(authControllerProvider).signOut();
+    // The router listener will handle the redirect to /login
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Trip App')),
+      appBar: AppBar(
+        title: const Text('Trip App'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Cerrar sesión',
+            onPressed: _signOut,
+          ),
+        ],
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
