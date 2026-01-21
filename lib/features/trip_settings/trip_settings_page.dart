@@ -38,7 +38,11 @@ class _TripSettingsPageState extends ConsumerState<TripSettingsPage> {
   }
 
   Future<void> _load() async {
-    final t = await _store.getCurrentTrip();
+    // Instead of instantiating LocalTripStore (which fails/returns null on Web),
+    // we use the provider which already handles Web(Firestore) vs Mobile(Isar).
+    final asyncValue = ref.read(currentTripStreamProvider);
+    final t = asyncValue.value; 
+    
     setState(() {
       _name = t?.name;
       _code = t?.code;

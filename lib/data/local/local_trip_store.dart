@@ -1,5 +1,4 @@
-﻿// import 'package:isar/isar.dart'; // Removed for Web support
-
+﻿import 'package:flutter/foundation.dart' show kIsWeb;
 import '../models/local_trip.dart';
 import 'isar_db.dart';
 
@@ -9,6 +8,7 @@ class LocalTripStore {
     required String name,
     required String code,
   }) async {
+    if (kIsWeb) return;
     final isar = await IsarDb.instance();
 
     await isar.writeTxn(() async {
@@ -25,6 +25,7 @@ class LocalTripStore {
   }
 
   Future<LocalTrip?> getCurrentTrip() async {
+    if (kIsWeb) return null;
     final isar = await IsarDb.instance();
     final list = await isar.localTrips.where().findAll();
     return list.isEmpty ? null : list.first;
@@ -34,6 +35,7 @@ class LocalTripStore {
     required DateTime startDate,
     required DateTime endDate,
   }) async {
+    if (kIsWeb) return;
     final isar = await IsarDb.instance();
 
     await isar.writeTxn(() async {
@@ -51,6 +53,7 @@ class LocalTripStore {
     String? destination,
     required bool useGeolocation,
   }) async {
+    if (kIsWeb) return;
     final isar = await IsarDb.instance();
 
     await isar.writeTxn(() async {
@@ -65,6 +68,7 @@ class LocalTripStore {
   }
 
   Future<void> clear() async {
+    if (kIsWeb) return;
     final isar = await IsarDb.instance();
     await isar.writeTxn(() async => isar.localTrips.clear());
   }
