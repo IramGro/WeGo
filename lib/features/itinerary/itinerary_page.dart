@@ -391,7 +391,11 @@ class _DayCardState extends State<_DayCard> {
     );
 
     if (confirm == true) {
-      await widget.repo.deleteItem(item.id);
+      await widget.repo.deleteItem(
+        item.id,
+        tripId: item.tripId,
+        firestoreId: item.firestoreId
+      );
       setState(() {});
     }
   }

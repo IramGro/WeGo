@@ -19,4 +19,7 @@ class ItineraryItem {
 
   DateTime? createdAt;
   DateTime? updatedAt;
+
+  // Campo auxiliar para Web/Sync
+  String? firestoreId;
 }

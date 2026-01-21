@@ -12,4 +12,6 @@ class ItineraryItem {
 
   DateTime? createdAt;
   DateTime? updatedAt;
+  
+  String? firestoreId;
 }
