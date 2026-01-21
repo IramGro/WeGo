@@ -28,8 +28,8 @@ class PhotosController extends StateNotifier<AsyncValue<void>> {
   final _uuid = const Uuid();
 
   Future<String?> _getTripId() async {
-     final tripAsync = ref.read(currentTripStreamProvider);
-     return tripAsync.value?.tripId;
+     final trip = await ref.read(currentTripStreamProvider.future);
+     return trip?.tripId;
   }
 
   Stream<List<TripPhoto>> getPhotos() async* {

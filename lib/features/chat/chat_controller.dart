@@ -24,8 +24,8 @@ class ChatController extends StateNotifier<AsyncValue<void>> {
 
   Future<String?> _getTripId() async {
     // Prefer the reactive provider which handles both Web (Firestore) and Mobile (Isar)
-    final tripAsync = ref.read(currentTripStreamProvider);
-    return tripAsync.value?.tripId;
+    final trip = await ref.read(currentTripStreamProvider.future);
+    return trip?.tripId;
   }
 
   Stream<List<ChatMessage>> getMessages() async* {
