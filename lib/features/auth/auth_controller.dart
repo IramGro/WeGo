@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,16 +19,24 @@ class AuthController {
 
   Future<void> signInWithGoogle() async {
     try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) return; // Usuario canceló
+      if (kIsWeb) {
+        // En Web, usamos signInWithPopup directamente con Firebase
+        // Esto evita problemas de configuración de GoogleSignIn y 'null check operators'
+        final provider = GoogleAuthProvider();
+        await _auth.signInWithPopup(provider);
+      } else {
+        // En Móvil, usamos el flujo nativo con GoogleSignIn package
+        final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+        if (googleUser == null) return; // Usuario canceló
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
+        final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+        final AuthCredential credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
+        );
 
-      await _auth.signInWithCredential(credential);
+        await _auth.signInWithCredential(credential);
+      }
     } catch (e) {
       // Manejar error de login si es necesario
       rethrow;
@@ -35,7 +44,9 @@ class AuthController {
   }
 
   Future<void> signOut() async {
-    await _googleSignIn.signOut();
+    if (!kIsWeb) {
+      await _googleSignIn.signOut();
+    }
     await _auth.signOut();
   }
 }
