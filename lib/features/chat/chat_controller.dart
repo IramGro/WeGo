@@ -2,10 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:trip_app/data/local/local_trip_store.dart';
+import 'package:trip_app/core/providers.dart';
 import 'chat_model.dart';
 
 final chatControllerProvider = StateNotifierProvider<ChatController, AsyncValue<void>>((ref) {
-  return ChatController();
+  return ChatController(ref);
 });
 
 final chatStreamProvider = StreamProvider.autoDispose<List<ChatMessage>>((ref) {
@@ -14,22 +15,29 @@ final chatStreamProvider = StreamProvider.autoDispose<List<ChatMessage>>((ref) {
 });
 
 class ChatController extends StateNotifier<AsyncValue<void>> {
-  ChatController() : super(const AsyncValue.data(null));
+  final Ref ref;
+  ChatController(this.ref) : super(const AsyncValue.data(null));
 
   final _db = FirebaseFirestore.instance;
   final _auth = FirebaseAuth.instance;
-  final _tripStore = LocalTripStore();
+  // final _tripStore = LocalTripStore(); // We use provider now
+
+  Future<String?> _getTripId() async {
+    // Prefer the reactive provider which handles both Web (Firestore) and Mobile (Isar)
+    final tripAsync = ref.read(currentTripStreamProvider);
+    return tripAsync.value?.tripId;
+  }
 
   Stream<List<ChatMessage>> getMessages() async* {
-    final trip = await _tripStore.getCurrentTrip();
-    if (trip == null) {
+    final tripId = await _getTripId();
+    if (tripId == null) {
       yield [];
       return;
     }
 
     yield* _db
         .collection('trips')
-        .doc(trip.tripId)
+        .doc(tripId)
         .collection('messages')
         .orderBy('timestamp', descending: true)
         .snapshots()
@@ -44,8 +52,8 @@ class ChatController extends StateNotifier<AsyncValue<void>> {
     final user = _auth.currentUser;
     if (user == null) return;
 
-    final trip = await _tripStore.getCurrentTrip();
-    if (trip == null) return;
+    final tripId = await _getTripId();
+    if (tripId == null) return;
 
     if (text.trim().isEmpty) return;
 
@@ -60,7 +68,7 @@ class ChatController extends StateNotifier<AsyncValue<void>> {
 
     await _db
         .collection('trips')
-        .doc(trip.tripId)
+        .doc(tripId)
         .collection('messages')
         .add(message.toMap());
   }
@@ -69,8 +77,8 @@ class ChatController extends StateNotifier<AsyncValue<void>> {
     final user = _auth.currentUser;
     if (user == null) return;
 
-    final trip = await _tripStore.getCurrentTrip();
-    if (trip == null) return;
+    final tripId = await _getTripId();
+    if (tripId == null) return;
 
     if (question.trim().isEmpty || options.length < 2) return;
 
@@ -88,7 +96,7 @@ class ChatController extends StateNotifier<AsyncValue<void>> {
 
     await _db
         .collection('trips')
-        .doc(trip.tripId)
+        .doc(tripId)
         .collection('messages')
         .add(message.toMap());
   }
@@ -97,12 +105,12 @@ class ChatController extends StateNotifier<AsyncValue<void>> {
     final user = _auth.currentUser;
     if (user == null) return;
 
-    final trip = await _tripStore.getCurrentTrip();
-    if (trip == null) return;
+    final tripId = await _getTripId();
+    if (tripId == null) return;
 
     final docRef = _db
         .collection('trips')
-        .doc(trip.tripId)
+        .doc(tripId)
         .collection('messages')
         .doc(messageId);
 

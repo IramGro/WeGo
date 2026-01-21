@@ -1,14 +1,16 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:trip_app/data/local/local_trip_store.dart';
+import 'package:trip_app/core/providers.dart'; // Import provider
 import 'package:uuid/uuid.dart';
 import 'photo_model.dart';
+import 'package:image_picker/image_picker.dart'; // XFile
 
 final photosControllerProvider = StateNotifierProvider<PhotosController, AsyncValue<void>>((ref) {
-  return PhotosController();
+  return PhotosController(ref);
 });
 
 final photosStreamProvider = StreamProvider.autoDispose<List<TripPhoto>>((ref) {
@@ -17,24 +19,29 @@ final photosStreamProvider = StreamProvider.autoDispose<List<TripPhoto>>((ref) {
 });
 
 class PhotosController extends StateNotifier<AsyncValue<void>> {
-  PhotosController() : super(const AsyncValue.data(null));
+  final Ref ref;
+  PhotosController(this.ref) : super(const AsyncValue.data(null));
 
   final _db = FirebaseFirestore.instance;
   final _storage = FirebaseStorage.instance;
   final _auth = FirebaseAuth.instance;
-  final _tripStore = LocalTripStore();
   final _uuid = const Uuid();
 
+  Future<String?> _getTripId() async {
+     final tripAsync = ref.read(currentTripStreamProvider);
+     return tripAsync.value?.tripId;
+  }
+
   Stream<List<TripPhoto>> getPhotos() async* {
-    final trip = await _tripStore.getCurrentTrip();
-    if (trip == null) {
+    final tripId = await _getTripId();
+    if (tripId == null) {
       yield [];
       return;
     }
 
     yield* _db
         .collection('trips')
-        .doc(trip.tripId)
+        .doc(tripId)
         .collection('photos')
         .orderBy('timestamp', descending: true)
         .snapshots()
@@ -45,25 +52,32 @@ class PhotosController extends StateNotifier<AsyncValue<void>> {
     });
   }
 
-  Future<void> uploadPhoto(String filePath) async {
+  Future<void> uploadPhoto(XFile file) async {
     state = const AsyncValue.loading();
     try {
       final user = _auth.currentUser;
       if (user == null) throw Exception('No autenticado');
 
-      final trip = await _tripStore.getCurrentTrip();
-      if (trip == null) throw Exception('No hay viaje seleccionado');
+      final tripId = await _getTripId();
+      if (tripId == null) throw Exception('No hay viaje seleccionado');
 
-      final file = File(filePath);
       final fileName = '${_uuid.v4()}.jpg';
-      final ref = _storage.ref().child('trips/${trip.tripId}/photos/$fileName');
+      final storageRef = _storage.ref().child('trips/$tripId/photos/$fileName');
 
-      // Upload
-      final uploadTask = ref.putFile(file);
-      final snapshot = await uploadTask;
+      TaskSnapshot snapshot;
+      if (kIsWeb) {
+        // Web: Upload bytes
+        final bytes = await file.readAsBytes();
+        final metadata = SettableMetadata(contentType: 'image/jpeg');
+        snapshot = await storageRef.putData(bytes, metadata);
+      } else {
+        // Mobile: Upload file
+        final ioFile = File(file.path);
+        snapshot = await storageRef.putFile(ioFile);
+      }
       
       if (snapshot.state == TaskState.success) {
-        final url = await ref.getDownloadURL();
+        final url = await storageRef.getDownloadURL();
 
         final photo = TripPhoto(
           id: '',
@@ -75,7 +89,7 @@ class PhotosController extends StateNotifier<AsyncValue<void>> {
 
         await _db
             .collection('trips')
-            .doc(trip.tripId)
+            .doc(tripId)
             .collection('photos')
             .add(photo.toMap());
         

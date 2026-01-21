@@ -46,7 +46,7 @@ class _PhotosPageState extends ConsumerState<PhotosPage> {
     if (picked != null) {
       setState(() => _uploading = true);
       try {
-        await ref.read(photosControllerProvider.notifier).uploadPhoto(picked.path);
+        await ref.read(photosControllerProvider.notifier).uploadPhoto(picked);
         if (mounted) {
            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Foto subida')));
         }

@@ -54,11 +54,11 @@ class _TicketsPageState extends ConsumerState<TicketsPage> {
       allowedExtensions: ['pdf', 'doc', 'docx', 'jpg', 'png'],
     );
 
-    if (result != null && result.files.single.path != null) {
+    if (result != null) {
       setState(() => _uploading = true);
       try {
         await ref.read(ticketsControllerProvider.notifier).uploadTicket(
-          filePath: result.files.single.path!, 
+          file: result.files.single, 
           title: titleCtrl.text.trim()
         );
         if (mounted) {
