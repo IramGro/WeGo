@@ -1,4 +1,5 @@
-﻿import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:uuid/uuid.dart';
 
@@ -76,13 +77,18 @@ class TripRepository {
     // Guardar referencia en el usuario
     await _addToUserTrips(uid, tripId, name, code);
 
-    // Guardar local (offline)
-    await selectTrip(tripId: tripId, name: name, code: code);
+    // Guardar local (offline) solo si NO es web
+    if (!kIsWeb) {
+      await selectTrip(tripId: tripId, name: name, code: code);
+    }
 
     return (tripId: tripId, code: code);
   }
 
   Future<void> selectTrip({required String tripId, required String name, required String code}) async {
+      // En Web, no usamos almacenamiento local Isar.
+      if (kIsWeb) return; 
+
       await _local.saveTrip(tripId: tripId, name: name, code: code);
       
       // Sincronizar fechas desde Firestore si existen
@@ -111,7 +117,10 @@ class TripRepository {
       'destination': destination,
       'useGeolocation': useGeolocation,
     });
-    await _local.setTripLocation(destination: destination, useGeolocation: useGeolocation);
+    
+    if (!kIsWeb) {
+      await _local.setTripLocation(destination: destination, useGeolocation: useGeolocation);
+    }
   }
 
   Future<void> updateTripDates({required String tripId, required DateTime startDate, required DateTime endDate}) async {
@@ -122,7 +131,9 @@ class TripRepository {
     });
 
     // Save locally
-    await _local.setTripDates(startDate: startDate, endDate: endDate);
+    if (!kIsWeb) {
+      await _local.setTripDates(startDate: startDate, endDate: endDate);
+    }
   }
 
   Future<({String tripId, String name, String code})> joinTripByCode({required String code}) async {
@@ -154,7 +165,9 @@ class TripRepository {
     await _addToUserTrips(uid, doc.id, name, storedCode);
 
     // Guardar local (offline)
-    await selectTrip(tripId: doc.id, name: name, code: storedCode);
+    if (!kIsWeb) {
+      await selectTrip(tripId: doc.id, name: name, code: storedCode);
+    }
 
     return (tripId: doc.id, name: name, code: storedCode);
   }
