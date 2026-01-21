@@ -1,21 +1,4 @@
-﻿import 'package:isar/isar.dart';
+﻿// Switcher for LocalTrip
+// export 'local_trip_native.dart' if (dart.library.html) 'local_trip_web.dart';
 
-part 'local_trip.g.dart';
-
-@collection
-class LocalTrip {
-  Id id = Isar.autoIncrement;
-
-  late String tripId;
-  late String name;
-  late String code;
-
-  DateTime? joinedAt;
-
-  // Fechas del viaje (opción A)
-  DateTime? startDate;
-  DateTime? endDate;
-
-  String? destination;
-  bool useGeolocation = false;
-}
+export 'local_trip_native.dart' if (dart.library.html) 'local_trip_web.dart';

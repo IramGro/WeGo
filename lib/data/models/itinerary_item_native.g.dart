@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'itinerary_item.dart';
+part of 'itinerary_item_native.dart';
 
 // **************************************************************************
 // IsarCollectionGenerator

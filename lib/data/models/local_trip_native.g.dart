@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'local_trip.dart';
+part of 'local_trip_native.dart';
 
 // **************************************************************************
 // IsarCollectionGenerator

@@ -1,1 +1,39 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"tripapp-iramdev-cb07a","appId":"1:249836205814:android:4b0f9d871e142ff1e6ded7","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"tripapp-iramdev-cb07a","configurations":{"android":"1:249836205814:android:4b0f9d871e142ff1e6ded7","ios":"1:249836205814:ios:9eb5166fdfac8606e6ded7","macos":"1:249836205814:ios:9eb5166fdfac8606e6ded7","web":"1:249836205814:web:af3eb48bc6353214e6ded7","windows":"1:249836205814:web:0d02b5fa3f0f9218e6ded7"}}}}}}
+{
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "tripapp-iramdev-cb07a",
+          "appId": "1:249836205814:android:4b0f9d871e142ff1e6ded7",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "tripapp-iramdev-cb07a",
+          "configurations": {
+            "android": "1:249836205814:android:4b0f9d871e142ff1e6ded7",
+            "ios": "1:249836205814:ios:9eb5166fdfac8606e6ded7",
+            "macos": "1:249836205814:ios:9eb5166fdfac8606e6ded7",
+            "web": "1:249836205814:web:af3eb48bc6353214e6ded7",
+            "windows": "1:249836205814:web:0d02b5fa3f0f9218e6ded7"
+          }
+        }
+      }
+    }
+  }
+}

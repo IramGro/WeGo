@@ -1,4 +1,4 @@
-﻿import 'package:isar/isar.dart';
+﻿// import 'package:isar/isar.dart'; // Removed for Web support
 
 import '../models/local_trip.dart';
 import 'isar_db.dart';

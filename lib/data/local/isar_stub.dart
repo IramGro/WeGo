@@ -1,0 +1,3 @@
+// Stub needed for web models if they used Isar types, but they are plain classes now.
+// However, if we need Isar.autoIncrement constant for the stub `isar_db_web.dart`...
+// The web models don't use it.

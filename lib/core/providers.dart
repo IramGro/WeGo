@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/local/local_trip_store.dart';
 import '../data/models/local_trip.dart';
 import '../data/local/isar_db.dart';
-import 'package:isar/isar.dart';
+// import 'package:isar/isar.dart';
 
 // Global tab index for bottom navigation
 final tabIndexProvider = StateProvider<int>((ref) => 0);

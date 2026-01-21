@@ -1,4 +1,4 @@
-﻿import 'package:isar/isar.dart';
+﻿// import 'package:isar/isar.dart'; // Removed for Web support
 
 import '../local/isar_db.dart';
 import '../models/itinerary_day.dart';
